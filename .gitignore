@@ -1,0 +1,12 @@
+# Archivos de sistema y entorno
+__pycache__/
+*.py[cod]
+.env
+venv/
+.vscode/
+.idea/
+
+# Datos de Docker (¡Muy importante no subir esto!)
+mysql_data/
+reportes_data/
+postgres_data/

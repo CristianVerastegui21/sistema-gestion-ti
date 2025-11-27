@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # Base de Datos MySQL
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ti_management
+      MYSQL_USER: user_ti
+      MYSQL_PASSWORD: password
+    volumes:
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - ti_network
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # API Gateway
+  api-gateway:
+    build: ./services/api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - EQUIPOS_SERVICE_URL=http://equipos-service:8000
+      - PROVEEDORES_SERVICE_URL=http://proveedores-service:8000
+      - MANTENIMIENTO_SERVICE_URL=http://mantenimiento-service:8000
+      - REPORTES_SERVICE_URL=http://reportes-service:8000
+      - AGENT_SERVICE_URL=http://agent-service:8000
+    networks:
+      - ti_network
+
+  # Microservicios (Conectados a MySQL)
+  equipos-service:
+    build: ./services/equipos_service
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=user_ti
+      - DB_PASSWORD=password
+      - DB_NAME=ti_management
+    networks:
+      - ti_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  proveedores-service:
+    build: ./services/proveedores_service
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=user_ti
+      - DB_PASSWORD=password
+      - DB_NAME=ti_management
+    networks:
+      - ti_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mantenimiento-service:
+    build: ./services/mantenimiento_service
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=user_ti
+      - DB_PASSWORD=password
+      - DB_NAME=ti_management
+    networks:
+      - ti_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  reportes-service:
+    build: ./services/reportes_service
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=user_ti
+      - DB_PASSWORD=password
+      - DB_NAME=ti_management
+    volumes:
+      - reportes_data:/app/reportes
+    networks:
+      - ti_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  agent-service:
+    build: ./services/agent_service
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=user_ti
+      - DB_PASSWORD=password
+      - DB_NAME=ti_management
+    networks:
+      - ti_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - API_GATEWAY_URL=http://api-gateway:8000
+    networks:
+      - ti_network
+    depends_on:
+      - api-gateway
+
+networks:
+  ti_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  reportes_data:
