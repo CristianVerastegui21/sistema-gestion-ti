@@ -27,7 +27,8 @@ with tab1:
     with col2: state_filter = st.selectbox("Estado", ["Todos", "operativo", "en_reparacion", "obsoleto"])
     with col3: 
         st.write("")
-        if st.button("🔄 Actualizar"): st.rerun()
+        if st.button("🔄 Actualizar"):
+            pass
 
     params = {}
     if cat_filter != "Todas": params['categoria'] = cat_filter
@@ -49,6 +50,7 @@ with tab2:
             codigo = st.text_input("Código*")
             nombre = st.text_input("Nombre*")
             marca = st.text_input("Marca")
+            modelo = st.text_input("Modelo")
             cat_id = st.selectbox("Categoría*", [c['id'] for c in categorias], format_func=lambda x: next((c['nombre'] for c in categorias if c['id']==x),''))
         with c2:
             serie = st.text_input("Serie")
@@ -60,9 +62,20 @@ with tab2:
         if st.form_submit_button("Guardar"):
             data = {
                 "codigo_inventario": codigo, "nombre": nombre, "marca": marca,
+                "modelo": modelo,
                 "categoria_id": cat_id, "numero_serie": serie, "costo_compra": costo,
                 "fecha_compra": str(fecha), "ubicacion_actual_id": ubi_id
             }
-            res = requests.post(f"{API_URL}/api/equipos/equipos", json=data)
-            if res.status_code == 200: st.success("Creado!"); st.rerun()
-            else: st.error("Error al crear")
+            
+            try:
+                res = requests.post(f"{API_URL}/api/equipos/equipos", json=data)
+                if res.status_code == 200: 
+                    # CAMBIO AQUÍ: Usamos toast o success simple, SIN globos ni rerun
+                    st.success("✅ Equipo creado exitosamente.")
+                    
+                    # st.balloons()  <-- ¡COMENTA O BORRA ESTA LÍNEA! (Es la culpable del error React)
+                    # st.rerun()     <-- ¡ESTA TAMBIÉN DEBE ESTAR BORRADA!
+                else: 
+                    st.error(f"Error al crear: {res.text}")
+            except Exception as e:
+                st.error(f"Error de conexión: {e}")
