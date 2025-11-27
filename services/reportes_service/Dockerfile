@@ -2,10 +2,10 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Instalar librerías del sistema necesarias para PostgreSQL y Reportes
+# Instalar librerías del sistema necesarias para MySQL y Reportes
 RUN apt-get update && apt-get install -y \
     gcc \
-    libpq-dev \
+    libmysqlclient-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

@@ -63,15 +63,30 @@ with tab1:
 
 with tab2:
     st.subheader("Exportar Datos")
-    if st.button("📥 Generar PDF Equipos"):
-        try:
-            res = requests.post(f"{API_URL}/api/reportes/export/pdf", json={"type": "equipos"}, timeout=10)
-            if res.status_code == 200:
-                st.success(f"PDF Generado: {res.json().get('filename')}")
-            else:
-                st.error(f"Error: {res.text}")
-        except Exception as e:
-            st.error(f"Fallo conexión: {e}")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.info("Generar PDF con listado de equipos")
+        
+        # Lógica de descarga directa
+        if st.button("📄 Generar PDF"):
+            with st.spinner("Generando documento..."):
+                try:
+                    # Hacemos la petición al backend
+                    res = requests.post(f"{API_URL}/api/reportes/export/pdf", json={"type": "equipos"})
+                    
+                    if res.status_code == 200:
+                        # Si es exitoso, mostramos el botón de descarga real
+                        st.download_button(
+                            label="📥 Descargar PDF Ahora",
+                            data=res.content,
+                            file_name="reporte_equipos.pdf",
+                            mime="application/pdf"
+                        )
+                        st.success("Documento generado. Haz clic arriba para bajarlo.")
+                    else:
+                        st.error("Error en el servidor al generar PDF")
+                except Exception as e:
+                    st.error(f"Fallo conexión: {e}")
 
 with tab3:
     st.subheader("Análisis de Valor")

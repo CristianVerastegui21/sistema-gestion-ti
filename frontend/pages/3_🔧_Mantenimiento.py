@@ -77,7 +77,6 @@ with tab2:
                     res = requests.post(f"{API_URL}/api/mantenimientos/mantenimientos", json=payload)
                     if res.status_code == 200:
                         st.success("✅ Mantenimiento programado exitosamente")
-                        st.balloons()
                     else:
                         st.error(f"Error al programar: {res.text}")
                 except Exception as e:
