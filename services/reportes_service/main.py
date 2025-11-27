@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 from fastapi import FastAPI, HTTPException
+=======
+from fastapi import FastAPI
+>>>>>>> c23fc51978c85d04894b8fb4a4d49b2747c4d4dd
 from fastapi.responses import StreamingResponse
 import aiomysql
 import os
@@ -181,4 +185,8 @@ async def export_pdf(payload: dict):
         )
     except Exception as e:
         print(f"❌ ERROR GENERANDO PDF: {str(e)}")
+<<<<<<< HEAD
+=======
+        from fastapi import HTTPException
+>>>>>>> c23fc51978c85d04894b8fb4a4d49b2747c4d4dd
         raise HTTPException(status_code=500, detail=f"Fallo PDF: {str(e)}")
