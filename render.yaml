@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: api-gateway
+    env: docker
+    dockerfilePath: ./services/api_gateway/Dockerfile
+    plan: free
+    envVars:
+      - key: AGENT_SERVICE_URL
+        value: http://agent-service:8000
+      - key: EQUIPOS_SERVICE_URL
+        value: http://equipos-service:8000
+
+  - type: web
+    name: agent-service
+    env: docker
+    dockerfilePath: ./services/agent_service/Dockerfile
+    plan: free
+
+  - type: web
+    name: equipos-service
+    env: docker
+    dockerfilePath: ./services/equipos_service/Dockerfile
+    plan: free
+
+  - type: web
+    name: mysql
+    env: docker
+    dockerfilePath: ./database/Dockerfile   # si tienes uno, o usa imagen oficial
+    plan: free
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 1
