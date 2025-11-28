@@ -27,7 +27,4 @@ services:
     env: docker
     dockerfilePath: ./database/Dockerfile   # si tienes uno, o usa imagen oficial
     plan: free
-    disk:
-      name: mysql-data
-      mountPath: /var/lib/mysql
-      sizeGB: 1
+    
